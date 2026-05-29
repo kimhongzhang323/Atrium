@@ -1,5 +1,7 @@
 "use server";
 
+import { randomInt } from "node:crypto";
+
 import { eq, sql } from "drizzle-orm";
 import { updateTag } from "next/cache";
 import { z } from "zod";
@@ -57,11 +59,12 @@ export const runDraw = defineAction({
     for (const prize of prizes) {
       if (pool.length === 0) break;
       const total = pool.reduce((s, e) => s + e.weight, 0);
-      let roll = Math.random() * total;
+      // CSPRNG: weighted pick is observable to participants, so don't use Math.random.
+      let roll = randomInt(0, total);
       let idx = 0;
       for (let i = 0; i < pool.length; i++) {
         roll -= pool[i]!.weight;
-        if (roll <= 0) { idx = i; break; }
+        if (roll < 0) { idx = i; break; }
       }
       const picked = pool.splice(idx, 1)[0]!;
       await tx.insert(drawResults).values({
