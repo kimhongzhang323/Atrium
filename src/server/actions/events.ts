@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { db } from "@/server/db/client";
+import { dbAdmin as db } from "@/server/db/client";
 import { events } from "@/server/db/schema";
 
 export const createEventSchema = z.object({
