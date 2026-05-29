@@ -1,10 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
-
-import { dbAdmin as db } from "@/server/db/client";
-import { events } from "@/server/db/schema";
 
 export const createEventSchema = z.object({
   code: z.string().min(2).max(8),
@@ -18,9 +14,8 @@ export const createEventSchema = z.object({
 
 export type CreateEventInput = z.infer<typeof createEventSchema>;
 
-export async function createEvent(input: CreateEventInput) {
-  const data = createEventSchema.parse(input);
-  const [row] = await db.insert(events).values(data).returning();
-  revalidatePath("/events");
-  return row;
+export async function createEvent(_input: CreateEventInput): Promise<never> {
+  throw new Error(
+    "createEvent is not implemented in Stage 1. It will be rewritten via defineAction in Stage 2 to run inside withTenantTx so RLS is enforced.",
+  );
 }
