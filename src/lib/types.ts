@@ -10,6 +10,7 @@ export type RoleId =
   | "committee";
 
 export type Permission =
+  // nav (UI filtering)
   | "view:dashboard"
   | "view:events"
   | "view:tasks"
@@ -24,9 +25,43 @@ export type Permission =
   | "view:files"
   | "view:draw"
   | "view:registration"
+  // profile / org
   | "profile.update"
+  | "org.create"
   | "org.invite"
-  | "org.assign_role";
+  | "org.assign_role"
+  | "org.assign_dept"
+  | "org.create_dept"
+  | "org.remove_member"
+  // Stage 2 — events & tasks
+  | "event.create"
+  | "event.update"
+  | "event.archive"
+  | "event.member.add"
+  | "task.create"
+  | "task.update"
+  | "task.assign"
+  | "task.comment"
+  // Stage 4 — money
+  | "sponsor.create"
+  | "sponsor.log"
+  | "sponsor.move_stage"
+  | "budget.create"
+  | "invoice.submit"
+  | "invoice.approve"
+  | "invoice.reject"
+  | "payment.record"
+  // Stage 5 — operations
+  | "checkin.create"
+  | "draw.run"
+  | "inventory.move"
+  | "file.link"
+  | "file.grant"
+  | "file.revoke"
+  | "signature.request"
+  | "signature.manage"
+  // Stage 6 — intelligence
+  | "signal.dismiss";
 
 export interface Role {
   id: RoleId;
