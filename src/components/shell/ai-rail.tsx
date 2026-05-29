@@ -28,7 +28,7 @@ export function AIRail() {
             7 of 12 vendors had zero issues last year. Pre-confirming saves ~3 weeks of LOGI procurement work.
           </Card>
           <Card title="MDEC grant runway">
-            Application closes Jan 10. Last year's awardees averaged RM 18k. Drafted boilerplate ready in Files.
+            Application closes Jan 10. Last year&apos;s awardees averaged RM 18k. Drafted boilerplate ready in Files.
           </Card>
         </Section>
 

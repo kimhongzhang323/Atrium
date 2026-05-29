@@ -24,7 +24,7 @@ export function DashboardView() {
           <h1 className="view-title">Good morning, Aisyah.</h1>
           <p className="view-subtitle">
             MYTECH 2027 is <strong style={{ color: "var(--text)" }}>{ev27.daysLeft} days</strong> away.
-            Here's what needs you today.
+            Here&apos;s what needs you today.
           </p>
         </div>
         <div style={{ display: "flex", gap: 6 }}>

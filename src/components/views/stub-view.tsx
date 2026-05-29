@@ -27,7 +27,7 @@ export function StubView({ title, subtitle, description, source }: Props) {
           </p>
           <p style={{ color: "var(--text-tertiary)", fontSize: 12.5, lineHeight: 1.5 }}>
             Port the JSX into a Server Component under <code>src/components/views/</code>,
-            replacing the prototype's mock data with Drizzle queries from <code>src/server/db</code>.
+            replacing the prototype&apos;s mock data with Drizzle queries from <code>src/server/db</code>.
             Wire mutations through Server Actions in <code>src/server/actions</code>.
           </p>
         </div>
