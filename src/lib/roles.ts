@@ -5,6 +5,7 @@ const ALL_PERMS: ReadonlyArray<Permission> = [
   "view:org", "view:team", "view:sponsors", "view:budget",
   "view:invoices", "view:approvals", "view:reports", "view:files",
   "view:draw", "view:registration",
+  "profile.update", "org.invite", "org.assign_role",
 ];
 
 export const ROLES: Record<RoleId, Role> = {
@@ -14,7 +15,13 @@ export const ROLES: Record<RoleId, Role> = {
   },
   vice_director: {
     id: "vice_director", label: "Vice Director", color: "#6b21a8",
-    permissions: ALL_PERMS,
+    permissions: [
+      "view:dashboard", "view:events", "view:tasks", "view:timeline",
+      "view:org", "view:team", "view:sponsors", "view:budget",
+      "view:invoices", "view:approvals", "view:reports", "view:files",
+      "view:draw", "view:registration",
+      "profile.update", "org.invite",
+    ],
   },
   secretary: {
     id: "secretary", label: "Secretary", color: "#047857",
@@ -22,6 +29,7 @@ export const ROLES: Record<RoleId, Role> = {
       "view:dashboard", "view:events", "view:tasks", "view:timeline",
       "view:org", "view:team", "view:approvals", "view:reports",
       "view:files", "view:registration",
+      "profile.update",
     ],
   },
   treasurer: {
@@ -30,6 +38,7 @@ export const ROLES: Record<RoleId, Role> = {
       "view:dashboard", "view:events", "view:tasks", "view:timeline",
       "view:org", "view:team", "view:sponsors", "view:budget",
       "view:invoices", "view:approvals", "view:reports", "view:files",
+      "profile.update",
     ],
   },
   dept_head: {
@@ -38,6 +47,7 @@ export const ROLES: Record<RoleId, Role> = {
       "view:dashboard", "view:events", "view:tasks", "view:timeline",
       "view:org", "view:team", "view:reports", "view:files",
       "view:draw", "view:registration",
+      "profile.update",
     ],
   },
   protocol: {
@@ -45,6 +55,7 @@ export const ROLES: Record<RoleId, Role> = {
     permissions: [
       "view:dashboard", "view:events", "view:tasks", "view:org",
       "view:team", "view:files", "view:registration",
+      "profile.update",
     ],
   },
   committee: {
@@ -52,6 +63,7 @@ export const ROLES: Record<RoleId, Role> = {
     permissions: [
       "view:dashboard", "view:events", "view:tasks", "view:timeline",
       "view:org", "view:team", "view:files", "view:draw",
+      "profile.update",
     ],
   },
 };

@@ -23,7 +23,10 @@ export type Permission =
   | "view:reports"
   | "view:files"
   | "view:draw"
-  | "view:registration";
+  | "view:registration"
+  | "profile.update"
+  | "org.invite"
+  | "org.assign_role";
 
 export interface Role {
   id: RoleId;
