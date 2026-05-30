@@ -1,4 +1,13 @@
-import { StubView } from "@/components/views/stub-view";
-export default function Page() {
-  return <StubView title="Tasks" subtitle="Kanban across departments" source="views-1.jsx → TasksView" />;
+import { redirect } from "next/navigation";
+
+import { TasksView } from "@/components/views/tasks-view";
+import { auth } from "@/server/auth";
+import { listTasks } from "@/server/queries/tasks";
+
+export default async function Page() {
+  const session = await auth();
+  if (!session?.user) redirect("/api/auth/signin");
+
+  const tasks = await listTasks();
+  return <TasksView tasks={tasks} />;
 }
