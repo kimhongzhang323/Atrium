@@ -2,19 +2,16 @@
 
 import { eq } from "drizzle-orm";
 import { updateTag } from "next/cache";
-import { z } from "zod";
 
 import { defineAction } from "@/server/action";
 import { AppError } from "@/lib/result";
 import { fileLinks, filePermissions } from "@/server/db/schema";
 
-export const linkDriveFileSchema = z.object({
-  driveFileId: z.string().min(1),
-  driveMimeType: z.string().min(1),
-  name: z.string().min(1).max(240),
-  eventId: z.string().uuid().optional(),
-  classification: z.enum(["public", "internal", "restricted", "confidential"]).default("internal"),
-});
+import {
+  grantFilePermissionSchema,
+  linkDriveFileSchema,
+  revokeFilePermissionSchema,
+} from "./files.schema";
 
 export const linkDriveFile = defineAction({
   name: "file.link",
@@ -40,14 +37,6 @@ export const linkDriveFile = defineAction({
     updateTag(`org:${session.orgId}:files`);
     return { file: row };
   },
-});
-
-export const grantFilePermissionSchema = z.object({
-  fileLinkId: z.string().uuid(),
-  principalType: z.enum(["user", "role", "dept"]),
-  principalId: z.string().min(1),
-  access: z.enum(["view", "comment", "edit", "sign"]),
-  expiresAt: z.coerce.date().optional(),
 });
 
 export const grantFilePermission = defineAction({
@@ -78,8 +67,6 @@ export const grantFilePermission = defineAction({
     return { permission: perm };
   },
 });
-
-export const revokeFilePermissionSchema = z.object({ permissionId: z.string().uuid() });
 
 export const revokeFilePermission = defineAction({
   name: "file.revoke",

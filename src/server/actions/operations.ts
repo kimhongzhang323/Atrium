@@ -4,7 +4,6 @@ import { randomInt } from "node:crypto";
 
 import { eq, sql } from "drizzle-orm";
 import { updateTag } from "next/cache";
-import { z } from "zod";
 
 import { defineAction } from "@/server/action";
 import { AppError } from "@/lib/result";
@@ -17,7 +16,11 @@ import {
   registrations,
 } from "@/server/db/schema";
 
-export const checkInAttendeeSchema = z.object({ registrationId: z.string().uuid() });
+import {
+  checkInAttendeeSchema,
+  recordInventoryMovementSchema,
+  runDrawSchema,
+} from "./operations.schema";
 
 export const checkInAttendee = defineAction({
   name: "checkin.create",
@@ -38,11 +41,6 @@ export const checkInAttendee = defineAction({
     updateTag(`event:${reg.eventId}:registrations`);
     return { checkIn };
   },
-});
-
-export const runDrawSchema = z.object({
-  eventId: z.string().uuid(),
-  prizes: z.array(z.string().min(1).max(80)).min(1).max(50),
 });
 
 export const runDraw = defineAction({
@@ -82,12 +80,6 @@ export const runDraw = defineAction({
     updateTag(`event:${eventId}:draw`);
     return { winners };
   },
-});
-
-export const recordInventoryMovementSchema = z.object({
-  itemId: z.string().uuid(),
-  delta: z.number().int(),
-  reason: z.string().min(1).max(120),
 });
 
 export const recordInventoryMovement = defineAction({

@@ -2,22 +2,11 @@
 
 import { and, eq, isNull } from "drizzle-orm";
 import { updateTag } from "next/cache";
-import { z } from "zod";
 
 import { defineAction } from "@/server/action";
 import { events } from "@/server/db/schema";
 
-export const createEventSchema = z.object({
-  code: z.string().min(1).max(16),
-  name: z.string().min(1).max(120),
-  venue: z.string().min(1).max(160),
-  budgetTotal: z.number().int().nonnegative().default(0),
-  sponsorTarget: z.number().int().nonnegative().default(0),
-  registrationsTarget: z.number().int().nonnegative().default(0),
-  isCompetition: z.boolean().default(false),
-  startsAt: z.coerce.date().optional(),
-  endsAt: z.coerce.date().optional(),
-});
+import { archiveEventSchema, createEventSchema, updateEventSchema } from "./events.schema";
 
 export const createEvent = defineAction({
   name: "event.create",
@@ -49,18 +38,6 @@ export const createEvent = defineAction({
   },
 });
 
-export const updateEventSchema = z.object({
-  id: z.string().uuid(),
-  name: z.string().min(1).max(120).optional(),
-  venue: z.string().min(1).max(160).optional(),
-  status: z.enum(["Planning", "Live", "Completed"]).optional(),
-  budgetTotal: z.number().int().nonnegative().optional(),
-  sponsorTarget: z.number().int().nonnegative().optional(),
-  registrationsTarget: z.number().int().nonnegative().optional(),
-  startsAt: z.coerce.date().optional(),
-  endsAt: z.coerce.date().optional(),
-});
-
 export const updateEvent = defineAction({
   name: "event.update",
   input: updateEventSchema,
@@ -80,8 +57,6 @@ export const updateEvent = defineAction({
     return { event: after };
   },
 });
-
-export const archiveEventSchema = z.object({ id: z.string().uuid() });
 
 export const archiveEvent = defineAction({
   name: "event.archive",

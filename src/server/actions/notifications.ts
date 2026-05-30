@@ -2,12 +2,15 @@
 
 import { and, eq } from "drizzle-orm";
 import { updateTag } from "next/cache";
-import { z } from "zod";
 
 import { defineAction } from "@/server/action";
 import { aiSignals, notificationPreferences, notifications } from "@/server/db/schema";
 
-export const markNotificationReadSchema = z.object({ id: z.string().uuid() });
+import {
+  dismissSignalSchema,
+  markNotificationReadSchema,
+  setNotificationPreferenceSchema,
+} from "./notifications.schema";
 
 export const markNotificationRead = defineAction({
   name: "notification.read",
@@ -22,8 +25,6 @@ export const markNotificationRead = defineAction({
     return { notification: row };
   },
 });
-
-export const dismissSignalSchema = z.object({ id: z.string().uuid() });
 
 export const dismissSignal = defineAction({
   name: "signal.dismiss",
@@ -40,12 +41,6 @@ export const dismissSignal = defineAction({
     updateTag(`org:${session.orgId}:signals`);
     return { signal: row };
   },
-});
-
-export const setNotificationPreferenceSchema = z.object({
-  eventType: z.string().min(1).max(80),
-  inApp: z.boolean().default(true),
-  email: z.boolean().default(false),
 });
 
 export const setNotificationPreference = defineAction({
