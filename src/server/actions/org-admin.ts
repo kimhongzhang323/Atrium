@@ -4,22 +4,17 @@ import { randomBytes } from "node:crypto";
 
 import { and, eq } from "drizzle-orm";
 import { updateTag } from "next/cache";
-import { z } from "zod";
 
 import { defineAction } from "@/server/action";
 import { departments, invitations, orgMembers, users } from "@/server/db/schema";
 
-const ROLE_VALUES = [
-  "director", "vice_director", "secretary", "treasurer",
-  "dept_head", "protocol", "committee",
-] as const;
-const DEPT_VALUES = ["SPR", "PnP", "PUB", "LOGI", "MM", "TECH"] as const;
-
-export const inviteMemberSchema = z.object({
-  email: z.string().email(),
-  role: z.enum(ROLE_VALUES).default("committee"),
-  dept: z.enum(DEPT_VALUES).optional(),
-});
+import {
+  assignDepartmentSchema,
+  assignRoleSchema,
+  createDepartmentSchema,
+  inviteMemberSchema,
+  removeMemberSchema,
+} from "./org-admin.schema";
 
 export const inviteMember = defineAction({
   name: "org.invite",
@@ -48,11 +43,6 @@ export const inviteMember = defineAction({
   },
 });
 
-export const assignRoleSchema = z.object({
-  userId: z.string().uuid(),
-  role: z.enum(ROLE_VALUES),
-});
-
 export const assignRole = defineAction({
   name: "org.assign_role",
   input: assignRoleSchema,
@@ -71,11 +61,6 @@ export const assignRole = defineAction({
     updateTag(`user:${userId}`);
     return { user: after };
   },
-});
-
-export const assignDepartmentSchema = z.object({
-  userId: z.string().uuid(),
-  dept: z.enum(DEPT_VALUES).nullable(),
 });
 
 export const assignDepartment = defineAction({
@@ -98,12 +83,6 @@ export const assignDepartment = defineAction({
   },
 });
 
-export const createDepartmentSchema = z.object({
-  code: z.string().min(1).max(16),
-  name: z.string().min(1).max(80),
-  color: z.string().max(16).optional(),
-});
-
 export const createDepartment = defineAction({
   name: "org.create_dept",
   input: createDepartmentSchema,
@@ -120,8 +99,6 @@ export const createDepartment = defineAction({
     return { department: row };
   },
 });
-
-export const removeMemberSchema = z.object({ userId: z.string().uuid() });
 
 export const removeMember = defineAction({
   name: "org.remove_member",

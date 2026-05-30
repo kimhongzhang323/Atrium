@@ -2,28 +2,17 @@
 
 import { and, eq } from "drizzle-orm";
 import { updateTag } from "next/cache";
-import { z } from "zod";
 
 import { defineAction } from "@/server/action";
 import { AppError } from "@/lib/result";
 import { approvals, invoiceLineItems, invoices, paymentRecords } from "@/server/db/schema";
 
-export const submitInvoiceSchema = z.object({
-  vendor: z.string().min(1).max(160),
-  amount: z.number().int().positive(),
-  eventId: z.string().uuid().optional(),
-  budgetLineId: z.string().uuid().optional(),
-  reference: z.string().max(80).optional(),
-  lineItems: z
-    .array(
-      z.object({
-        description: z.string().min(1).max(200),
-        quantity: z.number().int().positive().default(1),
-        unitAmount: z.number().int().nonnegative().default(0),
-      }),
-    )
-    .default([]),
-});
+import {
+  approveInvoiceSchema,
+  recordPaymentSchema,
+  rejectInvoiceSchema,
+  submitInvoiceSchema,
+} from "./invoices.schema";
 
 export const submitInvoice = defineAction({
   name: "invoice.submit",
@@ -70,12 +59,6 @@ const APPROVAL_FLOW: Record<string, { from: string; to: string; permission: "inv
   dept: { from: "submitted", to: "dept_approved", permission: "invoice.approve" },
   treasurer: { from: "dept_approved", to: "treasurer_approved", permission: "invoice.approve" },
 };
-
-export const approveInvoiceSchema = z.object({
-  invoiceId: z.string().uuid(),
-  stage: z.enum(["dept", "treasurer"]),
-  note: z.string().max(2000).optional(),
-});
 
 export const approveInvoice = defineAction({
   name: "invoice.approve",
@@ -131,12 +114,6 @@ export const approveInvoice = defineAction({
   },
 });
 
-export const rejectInvoiceSchema = z.object({
-  invoiceId: z.string().uuid(),
-  stage: z.enum(["dept", "treasurer"]),
-  note: z.string().max(2000).optional(),
-});
-
 export const rejectInvoice = defineAction({
   name: "invoice.reject",
   input: rejectInvoiceSchema,
@@ -167,13 +144,6 @@ export const rejectInvoice = defineAction({
     updateTag(`org:${session.orgId}:invoices`);
     return { invoice: after };
   },
-});
-
-export const recordPaymentSchema = z.object({
-  invoiceId: z.string().uuid(),
-  amount: z.number().int().positive(),
-  method: z.string().min(1).max(40),
-  reference: z.string().max(80).optional(),
 });
 
 export const recordPayment = defineAction({

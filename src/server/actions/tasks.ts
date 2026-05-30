@@ -2,18 +2,16 @@
 
 import { eq } from "drizzle-orm";
 import { updateTag } from "next/cache";
-import { z } from "zod";
 
 import { defineAction } from "@/server/action";
 import { taskComments, tasks } from "@/server/db/schema";
 
-export const createTaskSchema = z.object({
-  eventId: z.string().uuid(),
-  title: z.string().min(1).max(160),
-  dept: z.enum(["SPR", "PnP", "PUB", "LOGI", "MM", "TECH"]),
-  ownerId: z.string().uuid().optional(),
-  due: z.coerce.date().optional(),
-});
+import {
+  assignTaskSchema,
+  commentOnTaskSchema,
+  createTaskSchema,
+  updateTaskStatusSchema,
+} from "./tasks.schema";
 
 export const createTask = defineAction({
   name: "task.create",
@@ -41,11 +39,6 @@ export const createTask = defineAction({
   },
 });
 
-export const updateTaskStatusSchema = z.object({
-  id: z.string().uuid(),
-  status: z.enum(["Backlog", "In Progress", "Review", "Done"]),
-});
-
 export const updateTaskStatus = defineAction({
   name: "task.update_status",
   input: updateTaskStatusSchema,
@@ -69,11 +62,6 @@ export const updateTaskStatus = defineAction({
   },
 });
 
-export const assignTaskSchema = z.object({
-  id: z.string().uuid(),
-  ownerId: z.string().uuid().nullable(),
-});
-
 export const assignTask = defineAction({
   name: "task.assign",
   input: assignTaskSchema,
@@ -93,11 +81,6 @@ export const assignTask = defineAction({
     updateTag(`dept:${session.orgId}:${before.dept}:tasks`);
     return { task: after };
   },
-});
-
-export const commentOnTaskSchema = z.object({
-  taskId: z.string().uuid(),
-  body: z.string().min(1).max(4000),
 });
 
 export const commentOnTask = defineAction({

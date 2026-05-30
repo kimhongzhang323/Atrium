@@ -1,13 +1,17 @@
-import { StubView } from "@/components/views/stub-view";
+import { redirect } from "next/navigation";
 
-export default function SecretaryPage() {
+import { SecretaryConsole } from "@/components/views/secretary-console";
+import { auth } from "@/server/auth";
+import { listFileLinks } from "@/server/queries/files";
+
+export default async function SecretaryPage() {
+  const session = await auth();
+  if (!session?.user) redirect("/api/auth/signin");
+
+  const files = await listFileLinks();
   return (
     <div style={{ height: "100vh", overflow: "auto", background: "var(--bg)" }}>
-      <StubView
-        title="Secretary · Document Control Center"
-        subtitle="Editable letterheads, minutes, MOUs, proposals, reports · master template editor"
-        source="secretary.jsx + secretary.css"
-      />
+      <SecretaryConsole files={files} />
     </div>
   );
 }

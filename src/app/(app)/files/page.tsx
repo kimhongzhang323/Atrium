@@ -1,4 +1,13 @@
-import { StubView } from "@/components/views/stub-view";
-export default function Page() {
-  return <StubView title="Files" subtitle="Google Drive-linked · role-based folder locks" source="views-4.jsx → FilesView" />;
+import { redirect } from "next/navigation";
+
+import { FilesView } from "@/components/views/files-view";
+import { auth } from "@/server/auth";
+import { listFileLinks } from "@/server/queries/files";
+
+export default async function Page() {
+  const session = await auth();
+  if (!session?.user) redirect("/api/auth/signin");
+
+  const files = await listFileLinks();
+  return <FilesView files={files} />;
 }

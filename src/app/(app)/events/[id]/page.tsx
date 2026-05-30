@@ -1,14 +1,16 @@
-import { EVENTS } from "@/lib/data";
-import { StubView } from "@/components/views/stub-view";
+import { notFound, redirect } from "next/navigation";
+
+import { EventDetailView } from "@/components/views/event-detail-view";
+import { auth } from "@/server/auth";
+import { getEventById } from "@/server/queries/events";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const session = await auth();
+  if (!session?.user) redirect("/api/auth/signin");
+
   const { id } = await params;
-  const event = EVENTS.find((e) => e.id === id);
-  return (
-    <StubView
-      title={event?.name ?? "Event"}
-      subtitle={event ? `${event.code} · ${event.venue}` : "Event not found"}
-      source="views-1.jsx → EventDetailView"
-    />
-  );
+  const event = await getEventById(id);
+  if (!event) notFound();
+
+  return <EventDetailView event={event} />;
 }

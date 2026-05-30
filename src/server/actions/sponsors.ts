@@ -2,20 +2,15 @@
 
 import { eq } from "drizzle-orm";
 import { updateTag } from "next/cache";
-import { z } from "zod";
 
 import { defineAction } from "@/server/action";
 import { sponsorInteractions, sponsors } from "@/server/db/schema";
 
-const STAGE_VALUES = ["prospect", "contacted", "proposal", "committed", "declined"] as const;
-
-export const createSponsorSchema = z.object({
-  name: z.string().min(1).max(160),
-  eventId: z.string().uuid().optional(),
-  tier: z.string().max(40).optional(),
-  amountTarget: z.number().int().nonnegative().default(0),
-  ownerId: z.string().uuid().optional(),
-});
+import {
+  createSponsorSchema,
+  logSponsorInteractionSchema,
+  moveSponsorStageSchema,
+} from "./sponsors.schema";
 
 export const createSponsor = defineAction({
   name: "sponsor.create",
@@ -42,12 +37,6 @@ export const createSponsor = defineAction({
   },
 });
 
-export const logSponsorInteractionSchema = z.object({
-  sponsorId: z.string().uuid(),
-  kind: z.string().min(1).max(40),
-  note: z.string().min(1).max(4000),
-});
-
 export const logSponsorInteraction = defineAction({
   name: "sponsor.log",
   input: logSponsorInteractionSchema,
@@ -61,12 +50,6 @@ export const logSponsorInteraction = defineAction({
     updateTag(`sponsor:${sponsorId}`);
     return { interaction: row };
   },
-});
-
-export const moveSponsorStageSchema = z.object({
-  sponsorId: z.string().uuid(),
-  stage: z.enum(STAGE_VALUES),
-  amountSecured: z.number().int().nonnegative().optional(),
 });
 
 export const moveSponsorStage = defineAction({

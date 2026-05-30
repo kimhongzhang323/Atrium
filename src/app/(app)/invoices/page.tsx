@@ -1,4 +1,13 @@
-import { StubView } from "@/components/views/stub-view";
-export default function Page() {
-  return <StubView title="Invoices & Claims" subtitle="Approvals queue · fuel claim calculator" source="views-3.jsx → InvoicesView" />;
+import { redirect } from "next/navigation";
+
+import { InvoicesView } from "@/components/views/invoices-view";
+import { auth } from "@/server/auth";
+import { listInvoices } from "@/server/queries/invoices";
+
+export default async function Page() {
+  const session = await auth();
+  if (!session?.user) redirect("/api/auth/signin");
+
+  const invoices = await listInvoices();
+  return <InvoicesView invoices={invoices} />;
 }

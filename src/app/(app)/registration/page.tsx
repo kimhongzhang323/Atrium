@@ -1,4 +1,13 @@
-import { StubView } from "@/components/views/stub-view";
-export default function Page() {
-  return <StubView title="Registration" subtitle="Code Sprint 2027 · public form + teams" source="views-6.jsx → RegistrationView" />;
+import { redirect } from "next/navigation";
+
+import { RegistrationsView } from "@/components/views/registrations-view";
+import { auth } from "@/server/auth";
+import { listRegistrations } from "@/server/queries/registrations";
+
+export default async function Page() {
+  const session = await auth();
+  if (!session?.user) redirect("/api/auth/signin");
+
+  const registrations = await listRegistrations();
+  return <RegistrationsView registrations={registrations} />;
 }

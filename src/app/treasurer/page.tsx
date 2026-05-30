@@ -1,13 +1,18 @@
-import { StubView } from "@/components/views/stub-view";
+import { redirect } from "next/navigation";
 
-export default function TreasurerPage() {
+import { TreasurerConsole } from "@/components/views/treasurer-console";
+import { auth } from "@/server/auth";
+import { listBudgetLines } from "@/server/queries/budget";
+import { listInvoices } from "@/server/queries/invoices";
+
+export default async function TreasurerPage() {
+  const session = await auth();
+  if (!session?.user) redirect("/api/auth/signin");
+
+  const [invoices, budgetLines] = await Promise.all([listInvoices(), listBudgetLines()]);
   return (
     <div style={{ height: "100vh", overflow: "auto", background: "var(--bg)" }}>
-      <StubView
-        title="Treasurer · Finance Command Center"
-        subtitle="Cash position · approval inbox · 12-week cashflow · AR aging · variance · P&L · ledger"
-        source="treasurer.jsx + treasurer.css"
-      />
+      <TreasurerConsole invoices={invoices} budgetLines={budgetLines} />
     </div>
   );
 }

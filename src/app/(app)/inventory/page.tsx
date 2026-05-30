@@ -1,4 +1,13 @@
-import { StubView } from "@/components/views/stub-view";
-export default function Page() {
-  return <StubView title="Inventory" subtitle="Equipment · custody chain · linked to budget/invoices" source="views-5.jsx → InventoryView" />;
+import { redirect } from "next/navigation";
+
+import { InventoryView } from "@/components/views/inventory-view";
+import { auth } from "@/server/auth";
+import { listInventoryItems } from "@/server/queries/inventory";
+
+export default async function Page() {
+  const session = await auth();
+  if (!session?.user) redirect("/api/auth/signin");
+
+  const items = await listInventoryItems();
+  return <InventoryView items={items} />;
 }

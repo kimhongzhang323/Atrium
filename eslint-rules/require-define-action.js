@@ -9,12 +9,15 @@ module.exports = {
     schema: [],
     messages: {
       mustUseDefineAction:
-        "Server Actions in src/server/actions must be defined via defineAction(...). Exported functions here run RLS-unscoped if not wrapped.",
+        "Server Actions in src/server/actions must be defined via defineAction(...). Files here carry \"use server\", so every export must be an async action — put schemas and other values in a colocated *.schema.ts.",
     },
   },
   create(context) {
     const filename = (context.filename || context.getFilename()).replace(/\\/g, "/");
     if (!filename.includes("/src/server/actions/")) return {};
+    // Schemas live in colocated `*.schema.ts` files (plain modules, not "use server"),
+    // so client forms can share validation. Those files are exempt.
+    if (filename.endsWith(".schema.ts")) return {};
 
     function isDefineAction(init) {
       return (
@@ -26,9 +29,10 @@ module.exports = {
     }
 
     return {
-      // A raw exported `async function foo()` is an unwrapped action — forbidden.
       ExportNamedDeclaration(node) {
         const decl = node.declaration;
+        // Type-only exports (`export type`, `export interface`) are erased at
+        // build and don't violate the "use server" async-only export rule.
         if (!decl) return;
         if (decl.type === "FunctionDeclaration") {
           context.report({ node: decl, messageId: "mustUseDefineAction" });
@@ -36,14 +40,9 @@ module.exports = {
         }
         if (decl.type === "VariableDeclaration") {
           for (const d of decl.declarations) {
-            // Only flag exported *functions*. Schemas (z.object(...)) and other
-            // consts may be exported so client forms can share validation.
-            const init = d.init;
-            const isFn =
-              init &&
-              (init.type === "ArrowFunctionExpression" ||
-                init.type === "FunctionExpression");
-            if (isFn && !isDefineAction(init)) {
+            // In a "use server" file, exporting anything other than a defineAction
+            // wrapper breaks `next build` (only async functions may be exported).
+            if (!isDefineAction(d.init)) {
               context.report({ node: d, messageId: "mustUseDefineAction" });
             }
           }

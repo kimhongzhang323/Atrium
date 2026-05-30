@@ -1,5 +1,13 @@
-import { StubView } from "@/components/views/stub-view";
+import { redirect } from "next/navigation";
 
-export default function Page() {
-  return <StubView title="Events" subtitle="All events · MYTECH, Code Sprint, and more" source="views-1.jsx → EventsView" />;
+import { EventsView } from "@/components/views/events-view";
+import { auth } from "@/server/auth";
+import { listEvents } from "@/server/queries/events";
+
+export default async function Page() {
+  const session = await auth();
+  if (!session?.user) redirect("/api/auth/signin");
+
+  const events = await listEvents();
+  return <EventsView events={events} />;
 }

@@ -2,19 +2,11 @@
 
 import { and, eq } from "drizzle-orm";
 import { updateTag } from "next/cache";
-import { z } from "zod";
 
 import { defineAction } from "@/server/action";
 import { eventMembers } from "@/server/db/schema";
 
-export const addEventMemberSchema = z.object({
-  eventId: z.string().uuid(),
-  userId: z.string().uuid(),
-  role: z.enum([
-    "director", "vice_director", "secretary", "treasurer",
-    "dept_head", "protocol", "committee",
-  ]),
-});
+import { addEventMemberSchema, removeEventMemberSchema } from "./event-members.schema";
 
 export const addEventMember = defineAction({
   name: "event.member.add",
@@ -36,11 +28,6 @@ export const addEventMember = defineAction({
     updateTag(`event:${eventId}`);
     return { member: row };
   },
-});
-
-export const removeEventMemberSchema = z.object({
-  eventId: z.string().uuid(),
-  userId: z.string().uuid(),
 });
 
 export const removeEventMember = defineAction({
